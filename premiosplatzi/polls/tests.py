@@ -41,7 +41,6 @@ class QuestionIndexViewTest(TestCase):
 
     def test_past_question(self):
         """ Question with a pub_date in the past are displayed on the index page """
-
         question = createQuestion("Past question", days=-10)
         response = self.client.get(reverse("polls:index"))
         self.assertContains(response, "No polls are available.")
@@ -68,3 +67,17 @@ class QuestionIndexViewTest(TestCase):
             response.context["latest_question_list"],
             [past_question1, past_question2]
         ) 
+
+
+class QuestionDetailViewTest(TestCase):
+    def test_future_question(self):
+        future_question = createQuestion(question_text="future question", days=30)
+        url = reverse("polls:detail", args=(future_question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_past_question(self):
+        past_question = createQuestion(question_text="future question", days=-30)
+        url = reverse("polls:detail", args=(past_question.id,))
+        response = self.client.get(url)
+        self.assertContains(response, past_question.question_text) 

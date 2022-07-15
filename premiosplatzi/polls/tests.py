@@ -13,3 +13,14 @@ class QuestionModelTest(TestCase):
         time = timezone.now() + datetime.timedelta(days=30)
         future_question = Question(question_text="¿cual es el mejor course director de Platzi?", pub_date=time)
         self.assertIs(future_question.was_published_recently(), False)
+
+
+class QuestionIndexViewTest(TestCase):
+
+    def test_no_question(self):
+        """if no question exist , an aporpiate message is displayed"""
+
+        response = self.client.get(reverse('polls:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No polls are available")
+        self.assertQuerysetEqual(response.context["latest_question_list"], []) 
